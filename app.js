@@ -14,7 +14,7 @@ var uiController = (function() {
       return {
         type: document.querySelector(DOMStrings.inputType).value,
         description: document.querySelector(DOMStrings.inputDescription).value,
-        value: document.querySelector(DOMStrings.inputValue).value
+        value: parseInt(document.querySelector(DOMStrings.inputValue).value)
       };
     },
     getDOMStrings: function() {
@@ -109,17 +109,19 @@ var appController = (function(uiContr, fnContr) {
     // 1. Оруулах өгөгдлийг дэлгэцээс олж авна.
     var input = uiController.getInput();
 
-    // 2. Олж авсан өгөгдлүүдээ санхүүгийн контроллерт дамжуулж боловсруулан хадгална.
-    var item = financeController.addItem(
-      input.type,
-      input.description,
-      input.value
-    );
-    // 3. Олж авсан өгөгдлүүдээ вэбийн тохирох  хэсэгт гаргана.
-    uiController.addListItem(item, input.type);
-    uiController.clearFields();
-    // 4. Төсвийг тооцоолно.
-    // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана.
+    if (input.description !== "" && input.value !== "") {
+      // 2. Олж авсан өгөгдлүүдээ санхүүгийн контроллерт дамжуулж боловсруулан хадгална.
+      var item = financeController.addItem(
+        input.type,
+        input.description,
+        input.value
+      );
+      // 3. Олж авсан өгөгдлүүдээ вэбийн тохирох  хэсэгт гаргана.
+      uiController.addListItem(item, input.type);
+      uiController.clearFields();
+      // 4. Төсвийг тооцоолно.
+      // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана.
+    }
   };
   var setupEventListeners = function() {
     var DOM = uiController.getDOMStrings();
