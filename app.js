@@ -4,7 +4,9 @@ var uiController = (function() {
     inputType: ".add__type",
     inputDescription: ".add__description",
     inputValue: ".add__value",
-    addBtn: ".add__btn"
+    addBtn: ".add__btn",
+    incomeList: ".income__list",
+    expenceList: ".expenses__list"
   };
 
   return {
@@ -18,15 +20,31 @@ var uiController = (function() {
     getDOMStrings: function() {
       return DOMStrings;
     },
+
+    clearFields: function() {
+      var fields = document.querySelectorAll(
+        DOMStrings.inputDescription + "," + DOMStrings.inputValue
+      );
+      // Convert LIST to ARRAY
+      var fieldsArr = Array.prototype.slice.call(fields);
+      // for (i = 0; i < fieldsArr.length; i++) {
+      //   fieldsArr[i].value = "";
+      // }
+      fieldsArr.forEach(function(el, index, array) {
+        el.value = "";
+      });
+      fieldsArr[0].focus();
+    },
+
     addListItem: function(item, type) {
       // Орлого, зарлагын элемент агуулсан html-ыг бэлтгэнэ: Орлого, зарлага бичигдэх хэсгийн html кодыг хувьсагчид текст хэлбэртэй болгож хадгална.
       var html, list;
       if (type === "inc") {
-        list = ".income__list";
+        list = DOMStrings.incomeList;
         html =
           '<div class="item clearfix" id="income-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">+%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i>   </button></div>  </div></div>';
       } else {
-        list = ".expenses__list";
+        list = DOMStrings.expenceList;
         html =
           '<div class="item clearfix" id="expense-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">-%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
       }
@@ -99,6 +117,7 @@ var appController = (function(uiContr, fnContr) {
     );
     // 3. Олж авсан өгөгдлүүдээ вэбийн тохирох  хэсэгт гаргана.
     uiController.addListItem(item, input.type);
+    uiController.clearFields();
     // 4. Төсвийг тооцоолно.
     // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана.
   };
