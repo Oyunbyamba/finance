@@ -21,7 +21,31 @@ var uiController = (function() {
 })();
 
 // Санхүүгийн тооцоололтой ажиллах контроллер
-var financeController = (function() {})();
+var financeController = (function() {
+  // Орлого хүлээн авч массивд хадгалах зориулалттай байгуулагч функц
+  var Income = function(id, description, value) {
+    this.id = id;
+    this.description = description;
+    this.value = value;
+  };
+  // Зарлага хүлээн авч массивд хадгалах зориулалттай байгуулагч функц
+  var Expence = function(id, description, value) {
+    this.id = id;
+    this.description = description;
+    this.value = value;
+  };
+  // Орлого, зарлага хадгалах дата өгөгдлүүд хадгалах обьект
+  var data = {
+    allItems: {
+      inc: [],
+      exp: []
+    },
+    totals: {
+      inc: 0,
+      exp: 0
+    }
+  };
+})();
 
 // Эвентүүдтэй ажиллах буюу програмын холбогч контроллер
 var appController = (function(uiContr, fnContr) {
@@ -54,4 +78,31 @@ var appController = (function(uiContr, fnContr) {
   };
 })(uiController, financeController);
 
+// Эвентлистенерүүдийг дуудах обьект
 appController.init();
+
+/*
+// Орлого хүлээн авч массивд хадгалах зориулалттай байгуулагч функц
+var Income = function(id, description, value) {
+  this.id = id;
+  this.description = description;
+  this.value = value;
+};
+// Зарлага хүлээн авч массивд хадгалах зориулалттай байгуулагч функц
+var Expence = function(id, description, value) {
+  this.id = id;
+  this.description = description;
+  this.value = value;
+};
+var i1 = new Income(1, "Цалин", 2500000);
+var i2 = new Income(2, "Машин зарсан", 12500000);
+var i3 = new Income(3, "Бусад", 100000);
+// console.log(i1, i2, i3);
+
+var incomes = [];
+incomes.push(i1);
+incomes.push(i2);
+incomes.push(i3);
+
+console.log(incomes[2].id);
+*/
