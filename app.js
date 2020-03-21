@@ -35,12 +35,23 @@ var appController = (function(uiContr, fnContr) {
     // 4. Төсвийг тооцоолно.
     // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана.
   };
-  document.querySelector(DOM.addBtn).addEventListener("click", function() {
-    ctrlAddItem();
-  });
-  document.addEventListener("keypress", function(event) {
-    if (event.keyCode === 13 || event.which === 13) {
+  var setupEventListeners = function() {
+    var DOM = uiController.getDOMStrings();
+    document.querySelector(DOM.addBtn).addEventListener("click", function() {
       ctrlAddItem();
+    });
+    document.addEventListener("keypress", function(event) {
+      if (event.keyCode === 13 || event.which === 13) {
+        ctrlAddItem();
+      }
+    });
+  };
+  return {
+    init: function() {
+      console.log("Application start ...");
+      setupEventListeners();
     }
-  });
+  };
 })(uiController, financeController);
+
+appController.init();
