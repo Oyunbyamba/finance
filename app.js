@@ -73,6 +73,14 @@ var financeController = (function() {
     this.description = description;
     this.value = value;
   };
+  // Орлого зарлагын нийлбэр бодох функц
+  var calculateTotal = function(type) {
+    var sum = 0;
+    data.items[type].forEach(function(el) {
+      sum = sum + el.value;
+    });
+    data.totals[type] = sum;
+  };
   // Орлого, зарлага хадгалах дата өгөгдлүүд хадгалах обьект
   var data = {
     items: {
@@ -82,9 +90,29 @@ var financeController = (function() {
     totals: {
       inc: 0,
       exp: 0
-    }
+    },
+    tusuv: 0,
+    huvi: 0
   };
   return {
+    tusuvTootsooloh: function() {
+      // Нийт орлогын нийлбэрийг тооцоолно
+      calculateTotal("inc");
+      // Нийт зарлагын нийлбэрийг тооцоолно
+      calculateTotal("exp");
+      // Нийт төсөв тооцоолох
+      data.tusuv = data.totals.inc - data.totals.exp;
+      // Орлого, зарлагын хувийг тооцоолох
+      data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+    },
+    tusuvAvah: function() {
+      return {
+        tusuv: data.tusuv,
+        huvi: data.huvi,
+        totalInc: data.totals.inc,
+        totalExp: data.totals.exp
+      };
+    },
     addItem: function(type, desc, val) {
       var item, id;
       // id үүсгэх - items-ийн хамгийн сүүлчийн элемент дээр +1 гэж үүсгэнэ.
@@ -120,7 +148,11 @@ var appController = (function(uiContr, fnContr) {
       uiController.addListItem(item, input.type);
       uiController.clearFields();
       // 4. Төсвийг тооцоолно.
-      // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана.
+      financeController.tusuvTootsooloh();
+      // 5. Эцсийн үлдэгдэл, тооцоог нэгтгэж хадгална
+      var tusuv = financeController.tusuvAvah();
+      // 6. Төсвийн тооцоог дэлгэцэнд гаргана.
+      console.log(tusuv);
     }
   };
   var setupEventListeners = function() {
