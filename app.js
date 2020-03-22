@@ -197,13 +197,17 @@ var appController = (function(uiContr, fnContr) {
       // 3. Олж авсан өгөгдлүүдээ вэбийн тохирох  хэсэгт гаргана.
       uiController.addListItem(item, input.type);
       uiController.clearFields();
-      // 4. Төсвийг тооцоолно.
-      financeController.tusuvTootsooloh();
-      // 5. Эцсийн үлдэгдэл, тооцоог нэгтгэж хадгална
-      var tusuv = financeController.tusuvAvah();
-      // 6. Төсвийн тооцоог дэлгэцэнд гаргана.
-      uiController.tusuvUzuuleh(tusuv);
+      // Төсвийн шинээр тооцоолоод дэлгэцэнд үүзүүлнэ
+      updateTusuv();
     }
+  };
+  var updateTusuv = function() {
+    // 4. Төсвийг тооцоолно.
+    financeController.tusuvTootsooloh();
+    // 5. Эцсийн үлдэгдэл, тооцоог нэгтгэж хадгална
+    var tusuv = financeController.tusuvAvah();
+    // 6. Төсвийн тооцоог дэлгэцэнд гаргана.
+    uiController.tusuvUzuuleh(tusuv);
   };
   var setupEventListeners = function() {
     var DOM = uiController.getDOMStrings();
@@ -229,6 +233,7 @@ var appController = (function(uiContr, fnContr) {
           //2. Дэлгэц дээрээс энэ элементийг устгана.
           uiController.deleteListItem(id);
           //3. Үлдэгдэл тооцоог шинэчилж харуулна.
+          updateTusuv();
         }
       });
   };
