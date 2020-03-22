@@ -10,7 +10,8 @@ var uiController = (function() {
     tusuvLebel: ".budget__value",
     incomeLabel: ".budget__income--value",
     expenceLabel: ".budget__expenses--value",
-    percentageLebel: ".budget__expenses--percentage"
+    percentageLebel: ".budget__expenses--percentage",
+    containerDiv: ".container"
   };
 
   return {
@@ -25,6 +26,7 @@ var uiController = (function() {
       return DOMStrings;
     },
 
+    // Оруулсан өгөгдлүүдийн талбарыг цэвэрлэх
     clearFields: function() {
       var fields = document.querySelectorAll(
         DOMStrings.inputDescription + "," + DOMStrings.inputValue
@@ -47,6 +49,7 @@ var uiController = (function() {
     //   totalExp: data.totals.exp
     // };
 
+    // Төсвийн орлого, зарлагын мэдээллийг дэлгэц дээр гаргах
     tusuvUzuuleh: function(tusuv) {
       document.querySelector(DOMStrings.tusuvLebel).textContent =
         tusuv.tusuv + " ₮";
@@ -60,17 +63,23 @@ var uiController = (function() {
       } else document.querySelector(DOMStrings.percentageLebel).textContent = 0;
     },
 
+    // Сонгосон өгөгдлийг дэлгэц дээрх жагсаалтаас устгах
+    deleteListItem: function(id) {
+      var el = document.getElementById(id);
+      el.parentNode.removeChild(el);
+    },
+
     addListItem: function(item, type) {
       // Орлого, зарлагын элемент агуулсан html-ыг бэлтгэнэ: Орлого, зарлага бичигдэх хэсгийн html кодыг хувьсагчид текст хэлбэртэй болгож хадгална.
       var html, list;
       if (type === "inc") {
         list = DOMStrings.incomeList;
         html =
-          '<div class="item clearfix" id="income-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">+%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i>   </button></div>  </div></div>';
+          '<div class="item clearfix" id="inc-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">+%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i>   </button></div>  </div></div>';
       } else {
         list = DOMStrings.expenceList;
         html =
-          '<div class="item clearfix" id="expense-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">-%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+          '<div class="item clearfix" id="exp-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">-%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
       }
       // Тэр HTML дотор орлого, зарлагын утгуудыг REPLACE ашиглаж өөрчилж өгнө
       html = html.replace("%id%", item.id);
@@ -119,6 +128,9 @@ var financeController = (function() {
     huvi: 0
   };
   return {
+    seeData: function() {
+      return data;
+    },
     tusuvTootsooloh: function() {
       // Нийт орлогын нийлбэрийг тооцоолно
       calculateTotal("inc");
@@ -129,6 +141,7 @@ var financeController = (function() {
       // Орлого, зарлагын хувийг тооцоолох
       data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
     },
+    // Төсөв, орлого, зарлагын нийт дүнг хадгалж авах
     tusuvAvah: function() {
       return {
         tusuv: data.tusuv,
@@ -137,6 +150,19 @@ var financeController = (function() {
         totalExp: data.totals.exp
       };
     },
+    // Жагсаалтаас сонгосон элементийг өгөгдлийн бүтцээс устгана.
+    deleteItem: function(type, id) {
+      var ids = data.items[type].map(function(el) {
+        return el.id;
+      });
+
+      var index = ids.indexOf(id);
+
+      if (index !== -1) {
+        data.items[type].splice(index, 1);
+      }
+    },
+    // Шинэ өгөгдлийг өгөгдлийн бүтэц руу обьект хэлбэрээр хадгална.
     addItem: function(type, desc, val) {
       var item, id;
       // id үүсгэх - items-ийн хамгийн сүүлчийн элемент дээр +1 гэж үүсгэнэ.
@@ -189,6 +215,22 @@ var appController = (function(uiContr, fnContr) {
         ctrlAddItem();
       }
     });
+    document
+      .querySelector(DOM.containerDiv)
+      .addEventListener("click", function(e) {
+        // Үндсэн элемент(target) дээр click хийх үед Эцэг элемент(parentNode)-ын class дахь id-г сонгож аваад id - хувьсагчид олгох (parentNode нь хэдэн ш байх нь HTML-бүтцээс хамаарна.)
+        var id = e.target.parentNode.parentNode.parentNode.parentNode.id;
+        if (id) {
+          var arr = id.split("-");
+          var type = arr[0];
+          var itemId = parseInt(arr[1]); // parceInt()-тэмдэгт мөрийг тоо болгож хувиргана (id тул)
+          // 1. Санхүүгийн модулиас type, itemId -г ашиглаад устгана
+          financeController.deleteItem(type, itemId);
+          //2. Дэлгэц дээрээс энэ элементийг устгана.
+          uiController.deleteListItem(id);
+          //3. Үлдэгдэл тооцоог шинэчилж харуулна.
+        }
+      });
   };
   return {
     init: function() {
