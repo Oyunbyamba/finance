@@ -12,7 +12,8 @@ var uiController = (function() {
     expenceLabel: ".budget__expenses--value",
     percentageLabel: ".budget__expenses--percentage",
     containerDiv: ".container",
-    expPercentageLabel: ".item__percentage"
+    expPercentageLabel: ".item__percentage",
+    dateLabel: ".budget__title--month"
   };
   // NodeList - дээр forEach байхгүй тул давталт хийдэг энэ функц үүсгэж ашиглана
   var nodeListForEach = function(list, callback) {
@@ -20,7 +21,35 @@ var uiController = (function() {
       callback(list[i], i);
     }
   };
+  var formatMoney = function(too, type) {
+    too = "" + too;
+    var x = too
+      .split("")
+      .reverse()
+      .join("");
+    var y = "";
+    var count = 1;
+    for (var i = 0; i < x.length; i++) {
+      y = y + x[i];
+      if (count % 3 === 0) y = y + ",";
+      count++;
+    }
+    var z = y
+      .split("")
+      .reverse()
+      .join("");
+    if (z[0] === ",") z = z.substring(1, z.length);
+    if (type === "inc") z = "+ " + z;
+    else z = "- " + z;
+    return z;
+  };
   return {
+    displayDate: function() {
+      var unuudur = new Date();
+      document.querySelector(DOMStrings.dateLabel).textContent =
+        unuudur.getFullYear() + " оны " + unuudur.getMonth() + " - р сарын ";
+    },
+
     getInput: function() {
       return {
         type: document.querySelector(DOMStrings.inputType).value,
@@ -68,12 +97,19 @@ var uiController = (function() {
 
     // Төсвийн орлого, зарлагын мэдээллийг дэлгэц дээр гаргах
     tusuvUzuuleh: function(tusuv) {
+      var type;
+      if (tusuv.tusuv >= 0) type = "inc";
+      else type = "exp";
       document.querySelector(DOMStrings.tusuvLabel).textContent =
-        tusuv.tusuv + " ₮";
-      document.querySelector(DOMStrings.incomeLabel).textContent =
-        tusuv.totalInc;
-      document.querySelector(DOMStrings.expenceLabel).textContent =
-        tusuv.totalExp;
+        formatMoney(tusuv.tusuv, type) + " ₮";
+      document.querySelector(DOMStrings.incomeLabel).textContent = formatMoney(
+        tusuv.totalInc,
+        "inc"
+      );
+      document.querySelector(DOMStrings.expenceLabel).textContent = formatMoney(
+        tusuv.totalExp,
+        "exp"
+      );
       if (tusuv.huvi !== 0) {
         document.querySelector(DOMStrings.percentageLabel).textContent =
           tusuv.huvi + " %";
@@ -92,16 +128,16 @@ var uiController = (function() {
       if (type === "inc") {
         list = DOMStrings.incomeList;
         html =
-          '<div class="item clearfix" id="inc-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">+%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i>   </button></div>  </div></div>';
+          '<div class="item clearfix" id="inc-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i>   </button></div>  </div></div>';
       } else {
         list = DOMStrings.expenceList;
         html =
-          '<div class="item clearfix" id="exp-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">-%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+          '<div class="item clearfix" id="exp-%id%"><div class="item__description">%DESCRIPTION%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
       }
       // Тэр HTML дотор орлого, зарлагын утгуудыг REPLACE ашиглаж өөрчилж өгнө
       html = html.replace("%id%", item.id);
       html = html.replace("%DESCRIPTION%", item.description);
-      html = html.replace("%VALUE%", item.value);
+      html = html.replace("%VALUE%", formatMoney(item.value, type));
 
       // Бэлтгэсэн HTML-ээ DOM руу хийж өгнө.
       document.querySelector(list).insertAdjacentHTML("beforeend", html);
@@ -290,6 +326,7 @@ var appController = (function(uiContr, fnContr) {
   return {
     init: function() {
       console.log("Application start ...");
+      uiController.displayDate();
       uiController.tusuvUzuuleh({
         tusuv: 0,
         huvi: 0,
