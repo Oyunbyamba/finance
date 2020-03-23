@@ -50,6 +50,22 @@ var uiController = (function() {
         unuudur.getFullYear() + " оны " + unuudur.getMonth() + " - р сарын ";
     },
 
+    changeType: function() {
+      // Утга оруулах талбарын хүрээний өнгө өөрчилнө
+      var fields = document.querySelectorAll(
+        DOMStrings.inputType +
+          ", " +
+          DOMStrings.inputDescription +
+          ", " +
+          DOMStrings.inputValue
+      );
+      nodeListForEach(fields, function(el) {
+        el.classList.toggle("red-focus");
+      });
+      // Утга оруулах товчны өнгө өөрчилнө
+      document.querySelector(DOMStrings.addBtn).classList.toggle("red");
+    },
+
     getInput: function() {
       return {
         type: document.querySelector(DOMStrings.inputType).value,
@@ -305,6 +321,11 @@ var appController = (function(uiContr, fnContr) {
         ctrlAddItem();
       }
     });
+    // type-аас хамаарч талбарын өнгө өөрчлөгдөх
+    document
+      .querySelector(DOM.inputType)
+      .addEventListener("change", uiController.changeType);
+
     document
       .querySelector(DOM.containerDiv)
       .addEventListener("click", function(e) {
